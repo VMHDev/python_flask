@@ -1,0 +1,12 @@
+{
+    "question_content": "2 + 2 = ",
+    "question_vote" : 0,
+    "question_tag": 1,
+    "is_open": 1
+}
+
+{
+    "answer_question": 2,
+    "answer_content": "= 4",
+    "answer_vote" : -1
+}
