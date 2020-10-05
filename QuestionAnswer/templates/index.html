@@ -3,7 +3,7 @@
 {% block content %}
     <h1>{% block title %} Welcome to Demo Question & Answer With Flask{% endblock %}</h1>
     {% for question in questions %}
-        <a href="#">
+        <a href="{{ url_for('question', question_id=question['question_id']) }}">
             <h2>{{ question['question_content'] }}</h2>
         </a>
         <span class="badge badge-primary">{{ question['answer_content'] }}</span>
