@@ -1,30 +1,24 @@
+DROP TABLE IF EXISTS question;
 CREATE TABLE question (
-    question_id       INTEGER NOT NULL,
+    question_id       INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     question_content  STRING,
     question_vote     INTEGER DEFAULT (0),
     question_tag      INTEGER,
-    is_open           BOOLEAN,
-    PRIMARY KEY (
-        question_id
-    )
+    is_open           BOOLEAN
 );
 
+DROP TABLE IF EXISTS tag;
 CREATE TABLE tag (
-    tag_id    INTEGER NOT NULL,
-    tag_name  STRING,
-    PRIMARY KEY (
-        tag_id
-    )
+    tag_id    INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    tag_name  STRING
 );
 
+DROP TABLE IF EXISTS answer;
 CREATE TABLE answer (
-    answer_id        INTEGER NOT NULL,
+    answer_id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     answer_question  INTEGER,
     answer_content   STRING,
-    answer_vote      INTEGER DEFAULT (0),
-    PRIMARY KEY (
-        answer_id
-    )
+    answer_vote      INTEGER DEFAULT (0)
 );
 
 INSERT INTO tag (tag_name)  VALUES  ('Basic');
