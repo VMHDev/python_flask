@@ -11,5 +11,5 @@
     - IDE: Visual Code
 - Để tạo database chạy file init_db.py
 - File thực thi app.py
-- Tham khảo: hhttps://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
+- Tham khảo: https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 - Có giao diện người dùng
