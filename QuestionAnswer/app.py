@@ -56,6 +56,18 @@ def question(question_id):
 
 @app.route('/tagadd/', methods=('GET', 'POST'))
 def tagadd():
+    if request.method == 'POST':
+        tag_name = request.form['tagname']
+
+        if not tag_name:
+            flash('Name tag is required!')
+        else:
+            conn = get_db_connection()
+            conn.execute('INSERT INTO tag (tag_name) VALUES (?)',(tag_name,))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('index'))
+
     return render_template('tagadd.html')
 
 @app.route('/questionadd/', methods=('GET', 'POST'))

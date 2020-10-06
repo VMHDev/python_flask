@@ -5,9 +5,9 @@
 
 <form method="post">
     <div class="form-group">
-        <label for="content">Name</label>
-        <textarea name="content" placeholder="Tag name"
-                  class="form-control">{{ request.form['tag_name'] }}</textarea>
+        <label for="tagname">Name</label>
+        <textarea name="tagname" placeholder="Tag Name"
+                  class="form-control">{{ request.form['tagname'] }}</textarea>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
