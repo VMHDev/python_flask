@@ -1,7 +1,7 @@
 import sqlite3
 import json
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 
 def get_db_connection():
@@ -53,6 +53,14 @@ def question(question_id):
     question = get_question(question_id)
     answers = get_answerquestion(question_id)
     return render_template('question.html', question=question, answers=answers)
+
+@app.route('/tagadd/', methods=('GET', 'POST'))
+def tagadd():
+    return render_template('tagadd.html')
+
+@app.route('/questionadd/', methods=('GET', 'POST'))
+def questionadd():
+    return render_template('questionadd.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
