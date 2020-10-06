@@ -5,9 +5,19 @@
 
 <form method="post">
     <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" placeholder="Content Question"
-                  class="form-control">{{ request.form['content_question'] }}</textarea>
+        <label for="tag_select">Tag</label>
+        <select class="form-control" name="tag_select">
+            {% for tag in tags %}
+                <option value="{{ tag['tag_id'] }}">
+                    {{ tag['tag_name'] }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="contentquestion">Content</label>
+        <textarea name="contentquestion" placeholder="Content Question"
+                  class="form-control">{{ request.form['contentquestion'] }}</textarea>
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>

@@ -34,16 +34,25 @@ def get_answerquestion(question_id):
         abort(404)
     return answer
 
+def get_tagall():
+    conn = get_db_connection()
+    answer = conn.execute(' SELECT * FROM tag ').fetchall()
+    conn.close()
+    if answer is None:
+        abort(404)
+    return answer
+
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     conn = get_db_connection()
-    questions = conn.execute('  SELECT q.question_id, q.question_content, a.answer_content, a.answer_vote \
+    questions = conn.execute('  SELECT q.question_id, q.question_content, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
                                 FROM question AS q \
                                 LEFT JOIN answer AS a on a.answer_question = q.question_id \
-                                GROUP BY a.answer_question \
-                                HAVING a.answer_vote =  max(a.answer_vote)').fetchall()
+                                GROUP BY q.question_id \
+                                HAVING a.answer_vote =  max(a.answer_vote) OR a.answer_vote IS NULL \
+                                ORDER BY q.question_content').fetchall()
     conn.close()
     return render_template('index.html', questions=questions)
 
@@ -72,7 +81,23 @@ def tagadd():
 
 @app.route('/questionadd/', methods=('GET', 'POST'))
 def questionadd():
-    return render_template('questionadd.html')
+    if request.method == 'POST':
+        tag_id = request.form.get('tag_select')
+        content = request.form['contentquestion']
+
+        if not content:
+            flash('Content question is required!')
+        else:
+            conn = get_db_connection()
+            conn.execute('  INSERT INTO question (question_content, question_vote, question_tag, is_open) \
+                            VALUES (?, ?, ?, ?)'
+                            ,(content, 0, tag_id, 1))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('index'))
+
+    tags = get_tagall()
+    return render_template('questionadd.html', tags=tags)
 
 if __name__ == '__main__':
     app.run(debug=True)
