@@ -34,13 +34,25 @@ def get_answerquestion(question_id):
         abort(404)
     return answer
 
+#region Tag
 def get_tagall():
     conn = get_db_connection()
-    answer = conn.execute(' SELECT * FROM tag ').fetchall()
+    tags = conn.execute(' SELECT tag_id, tag_name FROM tag ').fetchall()
     conn.close()
-    if answer is None:
+    if tags is None:
         abort(404)
-    return answer
+    return tags
+
+def get_tag(tag_id):
+    conn = get_db_connection()
+    tag = conn.execute('SELECT tag_id, tag_name FROM tag \
+                        WHERE tag_id = ?',(tag_id,)
+                       ).fetchone()
+    conn.close()
+    if tag is None:
+        abort(404)
+    return tag
+#endregion
 
 app = Flask(__name__)
 
@@ -57,11 +69,17 @@ def index():
     return render_template('index.html', questions=questions)
 
 
-@app.route('/<int:question_id>')
+@app.route('/<int:question_id>/')
 def question(question_id):
     question = get_question(question_id)
     answers = get_answerquestion(question_id)
     return render_template('question.html', question=question, answers=answers)
+
+#region Tag
+@app.route('/tag/')
+def tag():
+    tags = get_tagall()
+    return render_template('tag.html', tags=tags)
 
 @app.route('/tagadd/', methods=('GET', 'POST'))
 def tagadd():
@@ -78,6 +96,27 @@ def tagadd():
             return redirect(url_for('index'))
 
     return render_template('tagadd.html')
+
+@app.route('/tag/<int:tagid>', methods=('GET', 'POST'))
+def tagedit(tagid):
+    tag = get_tag(tagid)
+
+    if request.method == 'POST':
+        tagname = request.form['tagname']
+
+        if not tagname:
+            flash('Tag Name is required!')
+        else:
+            conn = get_db_connection()
+            conn.execute('UPDATE tag SET tag_name = ?'
+                         'WHERE tag_id = ?',
+                         (tagname, tagid))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('tag'))
+
+    return render_template('tagedit.html', tag=tag)
+#endregion
 
 @app.route('/questionadd/', methods=('GET', 'POST'))
 def questionadd():
