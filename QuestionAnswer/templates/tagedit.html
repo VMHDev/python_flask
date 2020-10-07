@@ -1,16 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} Edit Tag {% endblock %}</h1>
-
+<div class="row">
+    <div class="col-12 col-md-10">
+        <h1>{% block title %} Edit Tag {% endblock %}</h1>
+    </div>
+    <div class="col-12 col-md-2">
+        <form action="{{ url_for('tagdelete', tagid=tag['tag_id']) }}" method="POST">
+            <input type="submit" value="Delete Tag"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to delete this tag?')">
+        </form>
+    </div>
+</div>
+<div class="form-group">
+    <label for="tagname">Tag Name</label>
+    <textarea name="tagname" placeholder="Tag Name"
+              class="form-control">{{ request.form['tagname']  or tag['tag_name'] }}</textarea>
+</div>
 <form method="post">
     <div class="form-group">
-        <label for="tagname">Tag Name</label>
-        <textarea name="tagname" placeholder="Tag Name"
-                  class="form-control">{{ request.form['tagname']  or tag['tag_name'] }}</textarea>
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Edit</button>
     </div>
 </form>
+
 {% endblock %}

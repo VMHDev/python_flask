@@ -71,6 +71,7 @@ def get_tag(tag_id):
 
 #=========================================================================================================================================
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'QuestionAnswerFlask'
 
 @app.route('/')
 def index():
@@ -150,6 +151,16 @@ def tagedit(tagid):
             return redirect(url_for('tag'))
 
     return render_template('tagedit.html', tag=tag)
+
+@app.route('/tag/<int:tagid>/delete', methods=('POST',))
+def tagdelete(tagid):
+    tag = get_tag(tagid)
+    conn = get_db_connection()
+    conn.execute('DELETE FROM tag WHERE tag_id = ?', (tagid,))
+    conn.commit()
+    conn.close()
+    flash('"{}" was successfully deleted!'.format(tag['tag_name']))
+    return redirect(url_for('tag'))
 #endregion
 
 if __name__ == '__main__':
