@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} List Tag {% endblock %}</h1>
+    {% for tag in tags %}
+        <a href="{{ url_for('tagedit', tagid=tag['tag_id']) }}">
+            <h2>{{ tag['tag_name'] }}</h2>
+        </a>
+        <hr>
+    {% endfor %}
+{% endblock %}

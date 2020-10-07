@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %} {{ question['question_content'] }} {% endblock %}</h2>
+    <span class="badge badge-primary">{{ question['tag_name'] }}</span>
+    {% for answer in answers %}
+        <p>{{ answer['answer_content'] }}</p>
+        <hr>
+    {% endfor %}
+{% endblock %}
