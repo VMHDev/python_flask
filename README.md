@@ -5,7 +5,3 @@
 - Thêm câu trả lời cho câu hỏi
 - Danh sách câu trả lời cho câu hỏi
 - Upvote/Downvote cho câu hỏi/câu trả lời
-
-## Web Blog:
-- Xem/Thêm/Xóa/Sửa các bài blog
-- Có giao diện người dùng
