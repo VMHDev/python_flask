@@ -18,7 +18,13 @@ class Tags:
                      'WHERE tag_id = ?',
                      (self.tag_name, tagid))
         conn.commit()
-        conn.close()        
+        conn.close()
+
+    def del_tags(self, tagid):
+        conn = get_db_connection()
+        conn.execute('DELETE FROM tag WHERE tag_id = ?', (tagid,))
+        conn.commit()
+        conn.close()           
 
 ###########################################################################################################################
 def get_tagall():

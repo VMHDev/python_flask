@@ -16,6 +16,60 @@ class Questions:
         conn.commit()
         conn.close()
 
+    def upd_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET question_content = ?'
+                     'WHERE question_id = ?',
+                     (self.question_content, questionid))
+        conn.commit()
+        conn.close()
+
+    def del_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('DELETE FROM question WHERE question_id = ?', (questionid,))
+        conn.commit()
+        conn.close() 
+
+    def addtag_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET question_tag = ?'
+                     'WHERE question_id = ?',
+                     (self.question_tagid, questionid))
+        conn.commit()
+        conn.close()     
+
+    def close_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET is_open = ?'
+                     'WHERE question_id = ?',
+                     (0, questionid))
+        conn.commit()
+        conn.close()
+
+    def open_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET is_open = ?'
+                     'WHERE question_id = ?',
+                     (1, questionid))
+        conn.commit()
+        conn.close()
+
+    def upvote_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET question_vote = ?'
+                     'WHERE question_id = ?',
+                     (self.question_vote + 1, questionid))
+        conn.commit()
+        conn.close()
+
+    def downvote_questions(self, questionid):
+        conn = get_db_connection()
+        conn.execute('UPDATE question SET question_vote = ?'
+                     'WHERE question_id = ?',
+                     (self.question_vote - 1, questionid))
+        conn.commit()
+        conn.close()
+
 ###########################################################################################################################
 def get_questionall():
     conn = get_db_connection()
