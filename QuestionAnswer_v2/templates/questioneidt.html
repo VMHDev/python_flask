@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Edit Question {% endblock %}</h1>
+<div class="form-group">
+    <label for="tagname">Question Content</label>
+    <textarea name="tagname" placeholder="Question Content"
+              class="form-control">{{ request.form['questioncontent']  or question['question_content'] }}</textarea>
+</div>
+<form method="post">
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Edit</button>
+    </div>
+</form>
+
+{% endblock %}

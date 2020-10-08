@@ -12,9 +12,10 @@ def get_db_connection():
 #region Function Question
 def get_questionall():
     conn = get_db_connection()
-    questions = conn.execute('  SELECT q.question_id, q.question_content, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
+    questions = conn.execute('  SELECT q.question_id, q.question_content,  tag_name, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
                                 FROM question AS q \
                                 LEFT JOIN answer AS a on a.answer_question = q.question_id \
+                                LEFT JOIN tag AS t ON t.tag_id = q.question_tag \
                                 GROUP BY q.question_id \
                                 HAVING a.answer_vote =  max(a.answer_vote) OR a.answer_vote IS NULL \
                                 ORDER BY q.question_content').fetchall()
@@ -83,11 +84,21 @@ def question():
     questions = get_questionall()
     return render_template('index.html', questions=questions)
 
-@app.route('/<int:question_id>/')
-def questiondetail(question_id):
-    question = get_question(question_id)
-    answers = get_answerquestion(question_id)
+@app.route('/question/<int:questionid>/')
+def questiondetail(questionid):
+    question = get_question(questionid)
+    answers = get_answerquestion(questionid)
     return render_template('question.html', question=question, answers=answers)
+
+@app.route('/question/<int:questionid>/edit/')
+def questionedit(questionid):
+    question = get_question(questionid)
+    return render_template('questioneidt.html', question=question)
+
+@app.route('/question/<int:questionid>/addanswer/', methods=('GET', 'POST'))
+def questionaddanswer(questionid):
+    question = get_question(questionid)
+    return render_template('questionaddanswer.html', question=question)
 
 @app.route('/questionadd/', methods=('GET', 'POST'))
 def questionadd():
@@ -161,6 +172,10 @@ def tagdelete(tagid):
     conn.close()
     flash('"{}" was successfully deleted!'.format(tag['tag_name']))
     return redirect(url_for('tag'))
+#endregion
+
+#region Route Answer
+
 #endregion
 
 if __name__ == '__main__':
