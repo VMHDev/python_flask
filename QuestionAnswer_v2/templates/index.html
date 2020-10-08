@@ -4,18 +4,25 @@
     <h1>{% block title %} Welcome to Demo Question & Answer With Flask{% endblock %}</h1>
     {% for question in questions %}
         <div class="row">
-            <div class="col-12 col-md-11">
+            <div class="col-12 col-md-10">
                 <a href="{{ url_for('questiondetail', questionid=question['question_id']) }}">
                     <h2>{{ question['question_content'] }}</h2>
                 </a>
             </div>
-            <div class="col-12 col-md-1">
+            <div class="col-12 col-md-2">
                 <div class="row">
                     <div class="col-12 col-md-6">
+                        {% if question['question_vote'] > 0 %}
+                            <h4>+ {{ question['question_vote'] }}</h4>
+                        {% else %}
+                            <h4>{{ question['question_vote'] }}</h4>
+                        {% endif %} 
+                    </div>                    
+                    <div class="col-12 col-md-3">
                         <a class="btn btn-dark btn-sm"
                             href=""><i class="fa fa-thumbs-o-up"></i></a>
                     </div>
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-3">
                         <a class="btn btn-dark btn-sm"
                             href=""><i class="fa fa-thumbs-o-down"></i></a>
                     </div>

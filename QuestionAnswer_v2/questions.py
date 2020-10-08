@@ -73,10 +73,11 @@ class Questions:
 ###########################################################################################################################
 def get_questionall():
     conn = get_db_connection()
-    questions = conn.execute('  SELECT q.question_id, q.question_content,  tag_name, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
+    questions = conn.execute('  SELECT q.question_id, q.question_content, q.question_vote, q.is_open, tag_name, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
                                 FROM question AS q \
                                 LEFT JOIN answer AS a on a.answer_question = q.question_id \
                                 LEFT JOIN tag AS t ON t.tag_id = q.question_tag \
+                                WHERE q.is_open = 1 \
                                 GROUP BY q.question_id \
                                 HAVING a.answer_vote =  max(a.answer_vote) OR a.answer_vote IS NULL \
                                 ORDER BY q.question_content').fetchall()
@@ -87,12 +88,14 @@ def get_questionall():
 
 def get_question(question_id):
     conn = get_db_connection()
-    question = conn.execute('   SELECT q.question_id, q.question_content, q.question_vote, t.tag_name, a.answer_content, a.answer_vote \
+    
+    question = conn.execute('   SELECT q.question_id, q.question_content, q.question_vote, t.tag_name, a.answer_content, a.answer_vote, q.is_open \
                                 FROM question AS q \
                                 LEFT JOIN answer AS a on a.answer_question = q.question_id \
                                 LEFT JOIN tag AS t ON t.tag_id = q.question_tag \
                                 WHERE q.question_id = ?',(question_id,)
                             ).fetchone()
+    # Chú ý thứ tự trong mệnh đề Select ảnh hưởng đến hàm questiondetail
     conn.close()
     if question is None:
         abort(404)

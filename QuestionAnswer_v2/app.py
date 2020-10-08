@@ -27,7 +27,8 @@ def question():
 def questiondetail(questionid):
     question = get_question(questionid)
     answers = get_answerquestion(questionid)
-    return render_template('question.html', question=question, answers=answers)
+
+    return render_template('question.html', question=question, answers=answers, isopen=question[6])
 
 @app.route('/question/<int:questionid>/edit/', methods=('GET', 'POST'))
 def questionedit(questionid):
@@ -97,6 +98,23 @@ def questionadd():
 
     tags = get_tagall()
     return render_template('questionadd.html', tags=tags)
+
+@app.route('/question/<int:questionid>/delete', methods=('POST',))
+def questiondelete(questionid):
+    obj_questions = Questions()
+    obj_questions.del_questions(questionid)
+
+    flash('Question delete successfully!')
+    return redirect(url_for('question'))
+
+@app.route('/question/<int:questionid>/close/', methods=('POST',))
+def questionclose(questionid):
+    obj_questions = Questions()
+    obj_questions.close_questions(questionid)
+
+    flash('Question close successfully!')    
+    return redirect(url_for('questiondetail', questionid=questionid))
+
 #endregion
 
 #region Route Tag
