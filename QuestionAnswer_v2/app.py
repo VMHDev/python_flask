@@ -17,6 +17,10 @@ app.config['SECRET_KEY'] = 'QuestionAnswerFlask'
 def index():
     return redirect(url_for('question'))
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 #region Route Question
 @app.route('/question/')
 def question():

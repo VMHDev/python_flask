@@ -22,5 +22,16 @@ CREATE TABLE answer (
 );
 
 INSERT INTO tag (tag_name)  VALUES  ('Basic');
+INSERT INTO tag (tag_name)  VALUES  ('Python');
+INSERT INTO tag (tag_name)  VALUES  ('Java');
+INSERT INTO tag (tag_name)  VALUES  ('C/C++');
+
 INSERT INTO question (question_content, question_vote, question_tag, is_open)  VALUES  ('1 + 1 =', 0, 1, 1);
 INSERT INTO answer (answer_question, answer_content, answer_vote)  VALUES  (1, '2', 0);
+
+INSERT INTO question (question_content, question_vote, question_tag, is_open)  VALUES  ('2 + 2 =', -1, 1, 1);
+INSERT INTO answer (answer_question, answer_content, answer_vote)  VALUES  (1, '4', 1);
+INSERT INTO answer (answer_question, answer_content, answer_vote)  VALUES  (1, '5', -1);
+
+INSERT INTO question (question_content, question_vote, question_tag, is_open)  VALUES  ('3 + 3 =', 2, 1, 1);
+INSERT INTO answer (answer_question, answer_content, answer_vote)  VALUES  (1, '6', 3);

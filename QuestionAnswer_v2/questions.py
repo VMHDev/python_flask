@@ -80,7 +80,7 @@ def get_questionall():
                                 WHERE q.is_open = 1 \
                                 GROUP BY q.question_id \
                                 HAVING a.answer_vote =  max(a.answer_vote) OR a.answer_vote IS NULL \
-                                ORDER BY q.question_content').fetchall()
+                                ORDER BY q.question_vote DESC').fetchall()
     conn.close()
     if questions is None:
         abort(404)
