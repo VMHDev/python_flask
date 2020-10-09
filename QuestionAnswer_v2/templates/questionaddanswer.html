@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Add new answer {% endblock %}</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="contentquestion">Question</label>
+        <textarea name="contentquestion" placeholder="Content Question"
+                  class="form-control" disabled>{{ question['question_content'] }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="contentanswer">Answer</label>
+        <textarea name="contentanswer" placeholder="Content Answer"
+                  class="form-control">{{ request.form['contentanswer'] }}</textarea>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+{% endblock %}

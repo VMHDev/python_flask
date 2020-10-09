@@ -4,70 +4,10 @@ import json
 from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 
-def get_db_connection():
-    conn = sqlite3.connect('questionanswer.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-#region Function Question
-def get_questionall():
-    conn = get_db_connection()
-    questions = conn.execute('  SELECT q.question_id, q.question_content, IFNULL(a.answer_content, \'No answer\') AS answer_content, IFNULL(a.answer_vote, 0) AS answer_vote \
-                                FROM question AS q \
-                                LEFT JOIN answer AS a on a.answer_question = q.question_id \
-                                GROUP BY q.question_id \
-                                HAVING a.answer_vote =  max(a.answer_vote) OR a.answer_vote IS NULL \
-                                ORDER BY q.question_content').fetchall()
-    conn.close()
-    if questions is None:
-        abort(404)
-    return questions
-
-def get_question(question_id):
-    conn = get_db_connection()
-    question = conn.execute('   SELECT q.question_id, q.question_content, q.question_vote, t.tag_name, a.answer_content, a.answer_vote \
-                                FROM question AS q \
-                                LEFT JOIN answer AS a on a.answer_question = q.question_id \
-                                LEFT JOIN tag AS t ON t.tag_id = q.question_tag \
-                                WHERE q.question_id = ?',(question_id,)
-                            ).fetchone()
-    conn.close()
-    if question is None:
-        abort(404)
-    return question
-#endregion
-
-def get_answerquestion(question_id):
-    conn = get_db_connection()
-    answer = conn.execute(' SELECT a.answer_id, a.answer_content, a.answer_vote, q.question_content, q.question_vote \
-                            FROM answer AS a \
-                            LEFT JOIN question AS q on q.question_id = a.answer_question \
-                            WHERE a.answer_question = ?',(question_id,)
-                         ).fetchall()
-    conn.close()
-    if answer is None:
-        abort(404)
-    return answer
-
-#region Function Tag
-def get_tagall():
-    conn = get_db_connection()
-    tags = conn.execute(' SELECT tag_id, tag_name FROM tag ').fetchall()
-    conn.close()
-    if tags is None:
-        abort(404)
-    return tags
-
-def get_tag(tag_id):
-    conn = get_db_connection()
-    tag = conn.execute('SELECT tag_id, tag_name FROM tag \
-                        WHERE tag_id = ?',(tag_id,)
-                       ).fetchone()
-    conn.close()
-    if tag is None:
-        abort(404)
-    return tag
-#endregion
+from databases import get_db_connection
+from questions import *
+from tags import *
+from answers import *
 
 #=========================================================================================================================================
 app = Flask(__name__)
@@ -77,17 +17,75 @@ app.config['SECRET_KEY'] = 'QuestionAnswerFlask'
 def index():
     return redirect(url_for('question'))
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 #region Route Question
 @app.route('/question/')
 def question():
     questions = get_questionall()
     return render_template('index.html', questions=questions)
 
-@app.route('/<int:question_id>/')
-def questiondetail(question_id):
-    question = get_question(question_id)
-    answers = get_answerquestion(question_id)
-    return render_template('question.html', question=question, answers=answers)
+@app.route('/question/<int:questionid>/')
+def questiondetail(questionid):
+    question = get_question(questionid)
+    answers = get_answerquestion(questionid)
+
+    return render_template('question.html', question=question, answers=answers, isopen=question[6])
+
+@app.route('/question/<int:questionid>/edit/', methods=('GET', 'POST'))
+def questionedit(questionid):
+    question = get_question(questionid)
+    
+    if request.method == 'POST':
+        questioncontent = request.form['questioncontent']
+
+        if not questioncontent:
+            flash('Question content is not required!')
+        else:
+            obj_questions = Questions(question_content=questioncontent)
+            obj_questions.upd_questions(questionid)
+
+            answers = get_answerquestion(questionid)
+            return redirect(url_for('question', question=question, answers=answers))
+    
+    return render_template('questioneidt.html', question=question)
+
+@app.route('/question/<int:questionid>/addanswer/', methods=('GET', 'POST'))
+def questionaddanswer(questionid):
+    question = get_question(questionid)
+
+    if request.method == 'POST':
+        contentanswer = request.form['contentanswer']
+
+        if not contentanswer:
+            flash('Answer is not required!')
+        else:
+            obj_answer = Answers(answer_question=questionid, answer_content=contentanswer)
+            obj_answer.addanswer_questions(questionid)
+
+            return redirect(url_for('questiondetail', questionid=questionid))
+
+    return render_template('questionaddanswer.html', question=question)
+
+@app.route('/question/<int:questionid>/addtag/', methods=('GET', 'POST'))
+def questionaddtag(questionid):
+    question = get_question(questionid)
+    tags = get_tagall()
+
+    if request.method == 'POST':
+        tagid = request.form['tag_select']
+
+        if not tagid:
+            flash('Tag is not required!')
+        else:
+            obj_questions = Questions(question_tagid=tagid)
+            obj_questions.addtag_questions(questionid)
+
+            return redirect(url_for('question'))
+
+    return render_template('questionaddtag.html', question=question, tags=tags)
 
 @app.route('/questionadd/', methods=('GET', 'POST'))
 def questionadd():
@@ -96,18 +94,46 @@ def questionadd():
         content = request.form['contentquestion']
 
         if not content:
-            flash('Content question is required!')
+            flash('Content question is not required!')
         else:
-            conn = get_db_connection()
-            conn.execute('  INSERT INTO question (question_content, question_vote, question_tag, is_open) \
-                            VALUES (?, ?, ?, ?)'
-                            ,(content, 0, tag_id, 1))
-            conn.commit()
-            conn.close()
+            obj_questions = Questions(question_content=content, question_tagid=tag_id)
+            obj_questions.ins_questions()
             return redirect(url_for('index'))
 
     tags = get_tagall()
     return render_template('questionadd.html', tags=tags)
+
+@app.route('/question/<int:questionid>/delete', methods=('POST',))
+def questiondelete(questionid):
+    obj_questions = Questions()
+    obj_questions.del_questions(questionid)
+
+    flash('Question delete successfully!')
+    return redirect(url_for('question'))
+
+@app.route('/question/<int:questionid>/close/', methods=('POST',))
+def questionclose(questionid):
+    obj_questions = Questions()
+    obj_questions.close_questions(questionid)
+
+    flash('Question close successfully!')    
+    return redirect(url_for('questiondetail', questionid=questionid))
+
+@app.route('/question/<int:questionid>/upvote/', methods=('POST',))
+def questionupvote(questionid):
+    obj_questions = Questions()
+    obj_questions.upvote_questions(questionid)
+
+    flash('Question up vote successfully!')
+    return redirect(url_for('question'))
+
+@app.route('/question/<int:questionid>/downvote/', methods=('POST',))
+def questiondownvote(questionid):
+    obj_questions = Questions()
+    obj_questions.downvote_questions(questionid)
+
+    flash('Question down vote successfully!')
+    return redirect(url_for('question'))
 #endregion
 
 #region Route Tag
@@ -119,16 +145,14 @@ def tag():
 @app.route('/tagadd/', methods=('GET', 'POST'))
 def tagadd():
     if request.method == 'POST':
-        tag_name = request.form['tagname']
+        tagname = request.form['tagname']
 
-        if not tag_name:
-            flash('Name tag is required!')
+        if not tagname:
+            flash('Name tag is not required!')
         else:
-            conn = get_db_connection()
-            conn.execute('INSERT INTO tag (tag_name) VALUES (?)',(tag_name,))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('index'))
+            obj_tags = Tags(tag_name=tagname)
+            obj_tags.ins_tags()
+            return redirect(url_for('tag'))
 
     return render_template('tagadd.html')
 
@@ -140,14 +164,10 @@ def tagedit(tagid):
         tagname = request.form['tagname']
 
         if not tagname:
-            flash('Tag Name is required!')
+            flash('Tag Name is not required!')
         else:
-            conn = get_db_connection()
-            conn.execute('UPDATE tag SET tag_name = ?'
-                         'WHERE tag_id = ?',
-                         (tagname, tagid))
-            conn.commit()
-            conn.close()
+            obj_tags = Tags(tag_name=tagname)
+            obj_tags.upd_tags(tagid)
             return redirect(url_for('tag'))
 
     return render_template('tagedit.html', tag=tag)
@@ -155,12 +175,30 @@ def tagedit(tagid):
 @app.route('/tag/<int:tagid>/delete', methods=('POST',))
 def tagdelete(tagid):
     tag = get_tag(tagid)
-    conn = get_db_connection()
-    conn.execute('DELETE FROM tag WHERE tag_id = ?', (tagid,))
-    conn.commit()
-    conn.close()
+
+    obj_tags = Tags()
+    obj_tags.del_tags(tagid)
+
     flash('"{}" was successfully deleted!'.format(tag['tag_name']))
     return redirect(url_for('tag'))
+#endregion
+
+#region Route Answer
+@app.route('/question/<int:questionid>/answer/<int:answerid>/upvote/', methods=('POST',))
+def answerupvote(questionid, answerid):
+    obj_answers = Answers()
+    obj_answers.upvote_answers(answerid)
+
+    flash('Answer up vote successfully!')
+    return redirect(url_for('questiondetail', questionid=questionid))
+
+@app.route('/question/<int:questionid>/answer/<int:answerid>/downvote/', methods=('POST',))
+def answerdownvote(questionid, answerid):
+    obj_answers = Answers()
+    obj_answers.downvote_answers(answerid)
+
+    flash('Answer down vote successfully!')
+    return redirect(url_for('questiondetail', questionid=questionid))
 #endregion
 
 if __name__ == '__main__':

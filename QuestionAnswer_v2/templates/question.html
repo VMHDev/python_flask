@@ -1,10 +1,88 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>{% block title %} {{ question['question_content'] }} {% endblock %}</h2>
-    <span class="badge badge-primary">{{ question['tag_name'] }}</span>
-    {% for answer in answers %}
-        <p>{{ answer['answer_content'] }}</p>
-        <hr>
-    {% endfor %}
+    <div class="row">
+        <div class="col-12 col-md-10">
+            <a href="{{ url_for('questionedit', questionid=question['question_id']) }}">
+                <h2>{% block title %} {{ question['question_content'] }} {% endblock %}</h2>
+            </a>
+            <span class="badge badge-primary">{{ question['tag_name'] }}</span>
+
+            {% if isopen %}
+                <h4>[OPEN]</h4>
+            {% else %}
+                <h4>[CLOSE]</h4>
+            {% endif %} 
+
+            {% if question['question_vote'] > 0 %}
+                <h4>+ {{ question['question_vote'] }}</h4>
+            {% else %}
+                <h4>{{ question['question_vote'] }}</h4>
+            {% endif %}                  
+        </div>
+
+        <div class="col-12 col-md-2">
+            <div class="row">
+                <div class="col-12 col-md-2"></div>
+                <div class="col-12 col-md-5">
+                    <form action="{{ url_for('questionclose', questionid=question['question_id']) }}" method="POST">
+                        <input type="submit" value="Close"
+                                class="btn btn-secondary btn-sm">
+                    </form>                        
+                </div>
+                <div class="col-12 col-md-5">
+                    <form action="{{ url_for('questiondelete', questionid=question['question_id']) }}" method="POST">
+                        <input type="submit" value="Delete Question"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this question?')">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-12">
+            {% for answer in answers %}
+                <div class="row">
+                    <div class="col-12 col-md-10">
+                        <p>{{ answer['answer_content'] }}</p>
+                        <hr>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                {% if answer['answer_vote'] > 0 %}
+                                    <h4>+ {{ answer['answer_vote'] }}</h4>
+                                {% else %}
+                                    <h4>{{ answer['answer_vote'] }}</h4>
+                                {% endif %} 
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <form action="{{ url_for('answerupvote', questionid=question['question_id'], answerid=answer['answer_id']) }}" method="POST">
+                                    <button type="submit" class="btn btn-dark btn-sm">
+                                        <i class="fa fa-thumbs-o-up"></i>
+                                    </button>
+                                </form>  
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <form action="{{ url_for('answerdownvote', questionid=question['question_id'], answerid=answer['answer_id']) }}" method="POST">
+                                    <button type="submit" class="btn btn-dark btn-sm">
+                                        <i class="fa fa-thumbs-o-down"></i>
+                                    </button>
+                                </form>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-12 col-md-12">
+            <div class="container">
+                <a class="btn btn-success btn-sm"
+                href="{{ url_for('questionaddanswer', questionid=question['question_id']) }}">Add Answer</a>             
+                <a class="btn btn-primary btn-sm"
+                href="{{ url_for('questionaddtag', questionid=question['question_id']) }}">Update Tag</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
