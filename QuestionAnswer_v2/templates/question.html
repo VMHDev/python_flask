@@ -44,19 +44,32 @@
         <div class="col-12 col-md-12">
             {% for answer in answers %}
                 <div class="row">
-                    <div class="col-12 col-md-11">
+                    <div class="col-12 col-md-10">
                         <p>{{ answer['answer_content'] }}</p>
                         <hr>
                     </div>
-                    <div class="col-12 col-md-1">
+                    <div class="col-12 col-md-2">
                         <div class="row">
                             <div class="col-12 col-md-6">
-                                <a class="btn btn-dark btn-sm"
-                                    href=""><i class="fa fa-thumbs-o-up"></i></a>
+                                {% if answer['answer_vote'] > 0 %}
+                                    <h4>+ {{ answer['answer_vote'] }}</h4>
+                                {% else %}
+                                    <h4>{{ answer['answer_vote'] }}</h4>
+                                {% endif %} 
                             </div>
-                            <div class="col-12 col-md-6">
-                                <a class="btn btn-dark btn-sm"
-                                    href=""><i class="fa fa-thumbs-o-down"></i></a>
+                            <div class="col-12 col-md-3">
+                                <form action="{{ url_for('answerupvote', questionid=question['question_id'], answerid=answer['answer_id']) }}" method="POST">
+                                    <button type="submit" class="btn btn-dark btn-sm">
+                                        <i class="fa fa-thumbs-o-up"></i>
+                                    </button>
+                                </form>  
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <form action="{{ url_for('answerdownvote', questionid=question['question_id'], answerid=answer['answer_id']) }}" method="POST">
+                                    <button type="submit" class="btn btn-dark btn-sm">
+                                        <i class="fa fa-thumbs-o-down"></i>
+                                    </button>
+                                </form>  
                             </div>
                         </div>
                     </div>

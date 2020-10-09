@@ -115,6 +115,21 @@ def questionclose(questionid):
     flash('Question close successfully!')    
     return redirect(url_for('questiondetail', questionid=questionid))
 
+@app.route('/question/<int:questionid>/upvote/', methods=('POST',))
+def questionupvote(questionid):
+    obj_questions = Questions()
+    obj_questions.upvote_questions(questionid)
+
+    flash('Question up vote successfully!')
+    return redirect(url_for('question'))
+
+@app.route('/question/<int:questionid>/downvote/', methods=('POST',))
+def questiondownvote(questionid):
+    obj_questions = Questions()
+    obj_questions.downvote_questions(questionid)
+
+    flash('Question down vote successfully!')
+    return redirect(url_for('question'))
 #endregion
 
 #region Route Tag
@@ -165,7 +180,21 @@ def tagdelete(tagid):
 #endregion
 
 #region Route Answer
+@app.route('/question/<int:questionid>/answer/<int:answerid>/upvote/', methods=('POST',))
+def answerupvote(questionid, answerid):
+    obj_answers = Answers()
+    obj_answers.upvote_answers(answerid)
 
+    flash('Answer up vote successfully!')
+    return redirect(url_for('questiondetail', questionid=questionid))
+
+@app.route('/question/<int:questionid>/answer/<int:answerid>/downvote/', methods=('POST',))
+def answerdownvote(questionid, answerid):
+    obj_answers = Answers()
+    obj_answers.downvote_answers(answerid)
+
+    flash('Answer down vote successfully!')
+    return redirect(url_for('questiondetail', questionid=questionid))
 #endregion
 
 if __name__ == '__main__':

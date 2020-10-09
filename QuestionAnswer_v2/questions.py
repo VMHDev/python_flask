@@ -56,17 +56,17 @@ class Questions:
 
     def upvote_questions(self, questionid):
         conn = get_db_connection()
-        conn.execute('UPDATE question SET question_vote = ?'
+        conn.execute('UPDATE question SET question_vote = question_vote + 1 '
                      'WHERE question_id = ?',
-                     (self.question_vote + 1, questionid))
+                     (questionid, ))
         conn.commit()
         conn.close()
 
     def downvote_questions(self, questionid):
         conn = get_db_connection()
-        conn.execute('UPDATE question SET question_vote = ?'
+        conn.execute('UPDATE question SET question_vote = question_vote - 1 '
                      'WHERE question_id = ?',
-                     (self.question_vote - 1, questionid))
+                     (questionid, ))
         conn.commit()
         conn.close()
 

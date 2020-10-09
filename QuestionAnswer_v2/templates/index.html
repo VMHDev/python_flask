@@ -19,12 +19,18 @@
                         {% endif %} 
                     </div>                    
                     <div class="col-12 col-md-3">
-                        <a class="btn btn-dark btn-sm"
-                            href=""><i class="fa fa-thumbs-o-up"></i></a>
+                        <form action="{{ url_for('questionupvote', questionid=question['question_id']) }}" method="POST">
+                            <button type="submit" class="btn btn-dark btn-sm">
+                                <i class="fa fa-thumbs-o-up"></i>
+                            </button>
+                        </form>  
                     </div>
                     <div class="col-12 col-md-3">
-                        <a class="btn btn-dark btn-sm"
-                            href=""><i class="fa fa-thumbs-o-down"></i></a>
+                        <form action="{{ url_for('questiondownvote', questionid=question['question_id']) }}" method="POST">
+                            <button type="submit" class="btn btn-dark btn-sm">
+                                <i class="fa fa-thumbs-o-down"></i>
+                            </button>
+                        </form>  
                     </div>
                 </div>                  
             </div>

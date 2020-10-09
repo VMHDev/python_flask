@@ -24,6 +24,22 @@ class Answers:
         conn.commit()
         conn.close() 
 
+    def upvote_answers(self, answerid):
+        conn = get_db_connection()
+        conn.execute('UPDATE answer SET answer_vote = answer_vote + 1 '
+                     'WHERE answer_id = ?',
+                     (answerid, ))
+        conn.commit()
+        conn.close()
+
+    def downvote_answers(self, answerid):
+        conn = get_db_connection()
+        conn.execute('UPDATE answer SET answer_vote = answer_vote - 1 '
+                     'WHERE answer_id = ?',
+                     (answerid, ))
+        conn.commit()
+        conn.close()
+
 ###########################################################################################################################
 def get_answerquestion(question_id):
     conn = get_db_connection()
