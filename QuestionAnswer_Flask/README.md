@@ -1,6 +1,4 @@
-# <div align = "center">Demo Python Restful API Service<br/> </div>
-## Xây dựng Web Blog cho phép:
-- Xem/Thêm/Xóa/Sửa các bài blog
+# <div align = "center">Demo Python With Flask</div>
 ## Thông tin
 - Sử dụng:
     - Flask 1.1.2
